@@ -7,8 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,6 +58,11 @@ fun HomeScreen(modifier: Modifier) {
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text (
+            text = "Units Converter",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(top = 16.dp)
+        )
         Row(
             modifier = modifier.padding(start = 16.dp, end = 16.dp)
         ) {
@@ -64,24 +71,37 @@ fun HomeScreen(modifier: Modifier) {
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
+                    .height(50.dp),
             ) {
-                Text(text = "Length")
+                Text(
+                    text = "Length",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
             Button(
                 onClick = { /*TODO*/ },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
+                    .height(50.dp),
+
             ) {
-                Text(text = "Volume")
+                Text(
+                    text = "Volume",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
             Button(
                 onClick = { /*TODO*/ },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
+                    .height(50.dp),
             ) {
-                Text(text = "Number")
+                Text(
+                    text = "Number",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }

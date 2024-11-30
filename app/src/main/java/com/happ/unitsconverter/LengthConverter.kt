@@ -25,21 +25,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import java.util.Locale
 
 @Composable
 fun LengthConverterApp(onDismiss: () -> Unit) {
     var inputValue by remember { mutableStateOf("") }
-    var result by remember { mutableDoubleStateOf(0.0) }
     var inputUnit by remember { mutableStateOf("m") }
     var outputUnit by remember { mutableStateOf("m") }
     var inputConversionFactor by remember { mutableDoubleStateOf(1.0) }
     var outputConversionFactor by remember { mutableDoubleStateOf(1.0) }
     var expandInput by remember { mutableStateOf(false) }
     var expandOutput by remember { mutableStateOf(false) }
+    var netFactor by remember { mutableDoubleStateOf(1.0) }
+    var result by remember { mutableDoubleStateOf(0.0) }
+
 
     fun calculateResult() {
         val inputValueDouble = inputValue.toDoubleOrNull() ?: 0.0
-        val netFactor = inputConversionFactor / outputConversionFactor
+        netFactor = inputConversionFactor / outputConversionFactor
         result = (inputValueDouble * netFactor)
     }
 
@@ -78,7 +81,15 @@ fun LengthConverterApp(onDismiss: () -> Unit) {
                     val units = mapOf(
                         "km" to 1000.0,
                         "m" to 1.0,
-                        "cm" to 0.01
+                        "cm" to 0.01,
+                        "mm" to 0.001,
+                        "µm" to 1e-6,
+                        "nm" to 1e-9,
+                        "ft" to 0.3048,
+                        "in" to 0.0254,
+                        "yd" to 0.9144,
+                        "mi" to 1609.34,
+                        "nmi" to 1852.0
                     )
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -141,6 +152,16 @@ fun LengthConverterApp(onDismiss: () -> Unit) {
                     text = "Result: $result $outputUnit",
                     modifier = Modifier.padding(top = 12.dp)
                 )
+                if (netFactor > 1.0) {
+                    Text (
+                        text= "Hint: Multiply by $netFactor",
+                    )
+                } else if (netFactor < 1.0) {
+                    val roundedValue = String.format(Locale.getDefault(), "%.2f", 1/netFactor)
+                    Text (
+                        text= "Hint: Divide by $roundedValue",
+                    )
+                }
             }
         }
     }
