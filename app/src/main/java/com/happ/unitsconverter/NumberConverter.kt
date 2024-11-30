@@ -18,36 +18,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import java.util.Locale
 
 @Composable
-fun LengthConverterApp(onDismiss: () -> Unit) {
-    var inputValue by remember { mutableStateOf("") }
-    var inputUnit by remember { mutableStateOf("m") }
-    var outputUnit by remember { mutableStateOf("m") }
-    var inputConversionFactor by remember { mutableDoubleStateOf(1.0) }
-    var outputConversionFactor by remember { mutableDoubleStateOf(1.0) }
-    var expandInput by remember { mutableStateOf(false) }
-    var expandOutput by remember { mutableStateOf(false) }
-    var netFactor by remember { mutableDoubleStateOf(1.0) }
-    var result by remember { mutableDoubleStateOf(0.0) }
-
-
-    fun calculateResult() {
-        val inputValueDouble = inputValue.toDoubleOrNull() ?: 0.0
-        netFactor = inputConversionFactor / outputConversionFactor
-        result = (inputValueDouble * netFactor)
-    }
-
+fun NumberConverterApp(onDismiss: () -> Unit) {
     Dialog(
         onDismissRequest = onDismiss
     ) {
@@ -59,8 +40,62 @@ fun LengthConverterApp(onDismiss: () -> Unit) {
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                var inputValue by remember { mutableStateOf("") }
+                var inputSystem by remember { mutableStateOf("Decimal") }
+                var outputSystem by remember { mutableStateOf("Decimal") }
+                var expandInput by remember { mutableStateOf(false) }
+                var expandOutput by remember { mutableStateOf(false) }
+                var result by remember { mutableStateOf("") }
+
+                fun convertToDecimal(inputValue: String, base: Int, validChars: Set<Char>): Int {
+                    return try {
+                        if (inputValue.all { it in validChars }) {
+                            Integer.parseInt(inputValue, base)
+                        } else {
+                            0
+                        }
+                    } catch (_: NumberFormatException) {
+                        0
+                    }
+                }
+
+                fun binaryToDecimal(binaryString: String): Int {
+                    val validBinaryChars = setOf('0', '1')
+                    return convertToDecimal(binaryString, 2, validBinaryChars)
+                }
+
+                fun octalToDecimal(octalString: String): Int {
+                    val validOctalChars = ('0'..'7').toSet()
+                    return convertToDecimal(octalString, 8, validOctalChars)
+                }
+
+                fun hexToDecimal(hexString: String): Int {
+                    val validHexChars = ('0'..'9').toSet() + ('A'..'F').toSet() + ('a'..'f').toSet()
+                    return convertToDecimal(hexString, 16, validHexChars)
+                }
+
+                fun calculateResult() {
+                    if (!inputValue.isEmpty()) {
+                        val inputInDecimal = when (inputSystem) {
+                            "Decimal" -> inputValue.toIntOrNull() ?: 0
+                            "Binary" -> binaryToDecimal(inputValue)
+                            "Octal" -> octalToDecimal(inputValue)
+                            "Hex" -> hexToDecimal(inputValue)
+                            else -> 0
+                        }
+                        val decimalToOutput = when (outputSystem) {
+                            "Decimal" -> inputInDecimal
+                            "Binary" -> Integer.toBinaryString(inputInDecimal.toInt())
+                            "Octal" -> Integer.toOctalString(inputInDecimal.toInt())
+                            "Hex" -> Integer.toHexString(inputInDecimal.toInt())
+                            else -> 0
+                        }
+                        result = decimalToOutput.toString().uppercase()
+                    }
+                }
+
                 Text(
-                    text = "Length Converter",
+                    text = "Number Converter",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -70,7 +105,7 @@ fun LengthConverterApp(onDismiss: () -> Unit) {
                         inputValue = it
                         calculateResult()
                     },
-                    label = { Text("Enter length in $inputUnit") },
+                    label = { Text("Enter a value") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -81,23 +116,11 @@ fun LengthConverterApp(onDismiss: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    val units = mapOf(
-                        "km" to 1000.0,
-                        "m" to 1.0,
-                        "cm" to 0.01,
-                        "mm" to 0.001,
-                        "µm" to 1e-6,
-                        "nm" to 1e-9,
-                        "ft" to 0.3048,
-                        "in" to 0.0254,
-                        "yd" to 0.9144,
-                        "mi" to 1609.34,
-                        "nmi" to 1852.0
-                    )
+                    val numberSystems = listOf<String>("Decimal", "Binary", "Octal", "Hex")
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Button(onClick = { expandInput = true }) {
-                            Text(inputUnit)
+                            Text(inputSystem)
                             Icon(
                                 Icons.Default.ArrowDropDown,
                                 contentDescription = "Input Dropdown Arrow"
@@ -106,13 +129,12 @@ fun LengthConverterApp(onDismiss: () -> Unit) {
                         DropdownMenu(
                             expanded = expandInput,
                             onDismissRequest = { expandInput = false }) {
-                            for ((unit, factor) in units) {
+                            for (system in numberSystems) {
                                 DropdownMenuItem(
-                                    text = { Text(unit) },
+                                    text = { Text(system) },
                                     onClick = {
-                                        inputConversionFactor = factor
+                                        inputSystem = system
                                         calculateResult()
-                                        inputUnit = unit
                                         expandInput = false
                                     }
                                 )
@@ -127,7 +149,7 @@ fun LengthConverterApp(onDismiss: () -> Unit) {
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Button(onClick = { expandOutput = true }) {
-                            Text(outputUnit)
+                            Text(outputSystem)
                             Icon(
                                 Icons.Default.ArrowDropDown,
                                 contentDescription = "Output Dropdown Arrow"
@@ -136,13 +158,12 @@ fun LengthConverterApp(onDismiss: () -> Unit) {
                         DropdownMenu(
                             expanded = expandOutput,
                             onDismissRequest = { expandOutput = false }) {
-                            for ((unit, factor) in units) {
+                            for (system in numberSystems) {
                                 DropdownMenuItem(
-                                    text = { Text(unit) },
+                                    text = { Text(system) },
                                     onClick = {
-                                        outputConversionFactor = factor
+                                        outputSystem = system
                                         calculateResult()
-                                        outputUnit = unit
                                         expandOutput = false
                                     }
                                 )
@@ -150,21 +171,10 @@ fun LengthConverterApp(onDismiss: () -> Unit) {
                         }
                     }
                 }
-
                 Text(
-                    text = "Result: $result $outputUnit",
+                    text = "Result: $result",
                     modifier = Modifier.padding(top = 12.dp)
                 )
-                if (netFactor > 1.0) {
-                    Text (
-                        text= "Hint: Multiply by $netFactor",
-                    )
-                } else if (netFactor < 1.0) {
-                    val roundedValue = String.format(Locale.getDefault(), "%.2f", 1/netFactor)
-                    Text (
-                        text= "Hint: Divide by $roundedValue",
-                    )
-                }
             }
         }
     }

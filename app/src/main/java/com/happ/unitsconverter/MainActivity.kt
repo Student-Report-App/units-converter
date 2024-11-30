@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 fun HomeScreen(modifier: Modifier) {
     var showLength by remember { mutableStateOf(false) }
 //    var showVolume by remember { mutableStateOf(false) }
-//    var showNumber by remember { mutableStateOf(false) }
+    var showNumber by remember { mutableStateOf(false) }
 
     if (showLength) {
         LengthConverterApp(onDismiss = { showLength = false })
@@ -50,9 +50,9 @@ fun HomeScreen(modifier: Modifier) {
 //    if (showVolume) {
 //        VolumeConverterApp(onDismiss = { showVolume = false })
 //    }
-//    if (showNumber) {
-//        NumberConverterApp(onDismiss = { showNumber = false })
-//    }
+    if (showNumber) {
+        NumberConverterApp(onDismiss = { showNumber = false })
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -92,7 +92,7 @@ fun HomeScreen(modifier: Modifier) {
                 )
             }
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { showNumber = true },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
