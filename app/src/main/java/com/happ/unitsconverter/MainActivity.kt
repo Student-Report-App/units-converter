@@ -41,15 +41,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun HomeScreen(modifier: Modifier) {
     var showLength by remember { mutableStateOf(false) }
-//    var showVolume by remember { mutableStateOf(false) }
+    var showVolume by remember { mutableStateOf(false) }
     var showNumber by remember { mutableStateOf(false) }
 
     if (showLength) {
         LengthConverterApp(onDismiss = { showLength = false })
     }
-//    if (showVolume) {
-//        VolumeConverterApp(onDismiss = { showVolume = false })
-//    }
+    if (showVolume) {
+        VolumeConverterApp(onDismiss = { showVolume = false })
+    }
     if (showNumber) {
         NumberConverterApp(onDismiss = { showNumber = false })
     }
@@ -79,7 +79,7 @@ fun HomeScreen(modifier: Modifier) {
                 )
             }
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { showVolume = true },
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp)
