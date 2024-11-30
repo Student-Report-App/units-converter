@@ -45,7 +45,7 @@ fun NumberConverterApp(onDismiss: () -> Unit) {
                 var outputSystem by remember { mutableStateOf("Decimal") }
                 var expandInput by remember { mutableStateOf(false) }
                 var expandOutput by remember { mutableStateOf(false) }
-                var result by remember { mutableStateOf("") }
+                var result by remember { mutableStateOf("0") }
 
                 fun convertToDecimal(inputValue: String, base: Int, validChars: Set<Char>): Int {
                     return try {

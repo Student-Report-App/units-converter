@@ -13,16 +13,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import java.util.Locale
 
-val units = mapOf(
-    "L" to 1.0,
-    "mL" to 0.001,
-    "m³" to 1000.0,
-    "cm³" to 0.000001,
-    "mm³" to 0.000000001
-)
-
 @Composable
-fun VolumeConverterApp(onDismiss: () -> Unit) {
+fun ConverterApp(
+    title: String,
+    units: Map<String, Double>,
+    initialUnit: String,
+    onDismiss: () -> Unit
+) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = MaterialTheme.shapes.medium,
@@ -33,10 +30,10 @@ fun VolumeConverterApp(onDismiss: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 var inputValue by remember { mutableStateOf("") }
-                var inputUnit by remember { mutableStateOf("L") }
-                var outputUnit by remember { mutableStateOf("L") }
-                var inputConversionFactor by remember { mutableDoubleStateOf(1.0) }
-                var outputConversionFactor by remember { mutableDoubleStateOf(1.0) }
+                var inputUnit by remember { mutableStateOf(initialUnit) }
+                var outputUnit by remember { mutableStateOf(initialUnit) }
+                var inputConversionFactor by remember { mutableDoubleStateOf(units[initialUnit] ?: 1.0) }
+                var outputConversionFactor by remember { mutableDoubleStateOf(units[initialUnit] ?: 1.0) }
                 var expandInput by remember { mutableStateOf(false) }
                 var expandOutput by remember { mutableStateOf(false) }
                 var netFactor by remember { mutableDoubleStateOf(1.0) }
@@ -48,14 +45,16 @@ fun VolumeConverterApp(onDismiss: () -> Unit) {
                     result = inputValueDouble * netFactor
                 }
 
-                TitleText()
-                InputField(inputValue, inputUnit) { newValue ->
+                TitleText(title)
+                InputField(title, inputValue, inputUnit) { newValue ->
                     inputValue = newValue
                     calculateResult()
                 }
 
                 UnitSelectionRow(
-                    inputUnit, outputUnit,
+                    inputUnit,
+                    outputUnit,
+                    units,
                     onInputUnitChange = { newUnit, factor ->
                         inputUnit = newUnit
                         inputConversionFactor = factor
@@ -68,7 +67,8 @@ fun VolumeConverterApp(onDismiss: () -> Unit) {
                         calculateResult()
                         expandOutput = false
                     },
-                    expandInput, expandOutput,
+                    expandInput,
+                    expandOutput,
                     { expandInput = true },
                     { expandOutput = true }
                 )
@@ -81,20 +81,20 @@ fun VolumeConverterApp(onDismiss: () -> Unit) {
 }
 
 @Composable
-fun TitleText() {
+fun TitleText(title: String) {
     Text(
-        text = "Volume Converter",
+        text = "$title Converter",
         style = MaterialTheme.typography.headlineSmall,
         modifier = Modifier.padding(bottom = 8.dp)
     )
 }
 
 @Composable
-fun InputField(inputValue: String, inputUnit: String, onValueChange: (String) -> Unit) {
+fun InputField(title:String, inputValue: String, inputUnit: String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
         value = inputValue,
         onValueChange = onValueChange,
-        label = { Text("Enter volume in $inputUnit") },
+        label = { Text("Enter $title in $inputUnit") },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = Modifier
             .fillMaxWidth()
@@ -106,6 +106,7 @@ fun InputField(inputValue: String, inputUnit: String, onValueChange: (String) ->
 fun UnitSelectionRow(
     inputUnit: String,
     outputUnit: String,
+    units: Map<String, Double>,
     onInputUnitChange: (String, Double) -> Unit,
     onOutputUnitChange: (String, Double) -> Unit,
     expandInput: Boolean,
@@ -121,7 +122,8 @@ fun UnitSelectionRow(
             unit = inputUnit,
             expanded = expandInput,
             onExpand = onExpandInput,
-            onUnitChange = onInputUnitChange
+            onUnitChange = onInputUnitChange,
+            units = units
         )
         Text(
             text = "to",
@@ -131,7 +133,8 @@ fun UnitSelectionRow(
             unit = outputUnit,
             expanded = expandOutput,
             onExpand = onExpandOutput,
-            onUnitChange = onOutputUnitChange
+            onUnitChange = onOutputUnitChange,
+            units = units
         )
     }
 }
@@ -141,7 +144,8 @@ fun UnitSelectionColumn(
     unit: String,
     expanded: Boolean,
     onExpand: () -> Unit,
-    onUnitChange: (String, Double) -> Unit
+    onUnitChange: (String, Double) -> Unit,
+    units: Map<String, Double>
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Button(onClick = onExpand) {
@@ -153,7 +157,7 @@ fun UnitSelectionColumn(
         }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { onExpand() }
+            onDismissRequest = {}
         ) {
             for ((unit, factor) in units) {
                 DropdownMenuItem(
@@ -167,8 +171,9 @@ fun UnitSelectionColumn(
 
 @Composable
 fun ResultText(result: Double, outputUnit: String) {
+    val formattedResult = formatResult(result)
     Text(
-        text = "Result: $result $outputUnit",
+        text = "Result: $formattedResult $outputUnit",
         modifier = Modifier.padding(top = 12.dp)
     )
 }
@@ -176,13 +181,22 @@ fun ResultText(result: Double, outputUnit: String) {
 @Composable
 fun HintText(netFactor: Double) {
     if (netFactor > 1.0) {
+        val formattedFactor = formatResult(netFactor)
         Text(
-            text = "Hint: Multiply by $netFactor",
+            text = "Hint: Multiply by $formattedFactor",
         )
     } else if (netFactor < 1.0) {
-        val roundedValue = String.format(Locale.getDefault(), "%.2f", 1 / netFactor)
+        val formattedFactor = formatResult(1 / netFactor)
         Text(
-            text = "Hint: Divide by $roundedValue",
+            text = "Hint: Divide by $formattedFactor",
         )
+    }
+}
+
+fun formatResult(value: Double): String {
+    return if (value < 1.0 && value > 0.0) {
+        String.format(Locale.getDefault(), "%.10f", value).trimEnd('0').trimEnd('.')
+    } else {
+        String.format(Locale.getDefault(), "%.2f", value)
     }
 }
