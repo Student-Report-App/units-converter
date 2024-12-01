@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,6 +44,8 @@ fun HomeScreen(modifier: Modifier) {
     var showLength by remember { mutableStateOf(false) }
     var showVolume by remember { mutableStateOf(false) }
     var showNumber by remember { mutableStateOf(false) }
+    var showCurrency by remember { mutableStateOf(false) }
+    var showWeight by remember { mutableStateOf(false) }
 
     if (showLength) {
         LengthConverterApp(onDismiss = { showLength = false })
@@ -52,6 +55,12 @@ fun HomeScreen(modifier: Modifier) {
     }
     if (showNumber) {
         NumberConverterApp(onDismiss = { showNumber = false })
+    }
+    if (showCurrency) {
+        CurrencyConverterApp(onDismiss = { showCurrency = false })
+    }
+    if (showWeight) {
+        WeightConverterApp(onDismiss = { showWeight = false })
     }
 
     Column(
@@ -64,7 +73,7 @@ fun HomeScreen(modifier: Modifier) {
             modifier = Modifier.padding(top = 16.dp)
         )
         Row(
-            modifier = modifier.padding(start = 16.dp, end = 16.dp)
+            modifier = modifier.padding(horizontal = 16.dp)
         ) {
             Button(
                 onClick = { showLength = true },
@@ -95,7 +104,6 @@ fun HomeScreen(modifier: Modifier) {
                 onClick = { showNumber = true },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 8.dp)
                     .height(50.dp),
             ) {
                 Text(
@@ -104,5 +112,41 @@ fun HomeScreen(modifier: Modifier) {
                 )
             }
         }
+
+        Row(
+            modifier = modifier.padding(horizontal = 16.dp)
+        ) {
+            Button(
+                onClick = { showCurrency = true },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+                    .height(50.dp),
+            ) {
+                Text(
+                    text = "Currency",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Button(
+                onClick = { showWeight = true },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(50.dp),
+            ) {
+                Text(
+                    text = "Weight",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Text(
+            text = "Made with ❤️ by Team HAP-P",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
     }
 }
