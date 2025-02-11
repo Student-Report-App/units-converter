@@ -159,10 +159,10 @@ fun UnitSelectionColumn(
             expanded = expanded,
             onDismissRequest = {}
         ) {
-            for ((unit, factor) in units) {
+            for ((unitName, factor) in units) {
                 DropdownMenuItem(
-                    text = { Text(unit) },
-                    onClick = { onUnitChange(unit, factor) }
+                    text = { Text(unitName) },
+                    onClick = { onUnitChange(unitName, factor) }
                 )
             }
         }
