@@ -40,9 +40,13 @@ fun NumberConverterApp(onDismiss: () -> Unit) {
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val decimal = "Decimal"
+                val binary = "Binary"
+                val octal = "Octal"
+                val hex = "Hex"
                 var inputValue by remember { mutableStateOf("") }
-                var inputSystem by remember { mutableStateOf("Decimal") }
-                var outputSystem by remember { mutableStateOf("Decimal") }
+                var inputSystem by remember { mutableStateOf(decimal) }
+                var outputSystem by remember { mutableStateOf(decimal) }
                 var expandInput by remember { mutableStateOf(false) }
                 var expandOutput by remember { mutableStateOf(false) }
                 var result by remember { mutableStateOf("0") }
@@ -77,17 +81,17 @@ fun NumberConverterApp(onDismiss: () -> Unit) {
                 fun calculateResult() {
                     if (!inputValue.isEmpty()) {
                         val inputInDecimal = when (inputSystem) {
-                            "Decimal" -> inputValue.toIntOrNull() ?: 0
-                            "Binary" -> binaryToDecimal(inputValue)
-                            "Octal" -> octalToDecimal(inputValue)
-                            "Hex" -> hexToDecimal(inputValue)
+                            decimal -> inputValue.toIntOrNull() ?: 0
+                            binary -> binaryToDecimal(inputValue)
+                            octal -> octalToDecimal(inputValue)
+                            hex -> hexToDecimal(inputValue)
                             else -> 0
                         }
                         val decimalToOutput = when (outputSystem) {
-                            "Decimal" -> inputInDecimal
-                            "Binary" -> Integer.toBinaryString(inputInDecimal.toInt())
-                            "Octal" -> Integer.toOctalString(inputInDecimal.toInt())
-                            "Hex" -> Integer.toHexString(inputInDecimal.toInt())
+                            decimal -> inputInDecimal
+                            binary -> Integer.toBinaryString(inputInDecimal.toInt())
+                            octal -> Integer.toOctalString(inputInDecimal.toInt())
+                            hex -> Integer.toHexString(inputInDecimal.toInt())
                             else -> 0
                         }
                         result = decimalToOutput.toString().uppercase()
@@ -116,7 +120,7 @@ fun NumberConverterApp(onDismiss: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    val numberSystems = listOf<String>("Decimal", "Binary", "Octal", "Hex")
+                    val numberSystems = listOf<String>(decimal, binary, octal, hex)
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Button(onClick = { expandInput = true }) {
