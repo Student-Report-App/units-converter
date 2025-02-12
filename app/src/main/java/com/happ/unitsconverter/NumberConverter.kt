@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -18,9 +19,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -79,23 +80,24 @@ fun NumberConverterApp(onDismiss: () -> Unit) {
                 }
 
                 fun calculateResult() {
-                    if (!inputValue.isEmpty()) {
-                        val inputInDecimal = when (inputSystem) {
-                            decimal -> inputValue.toIntOrNull() ?: 0
-                            binary -> binaryToDecimal(inputValue)
-                            octal -> octalToDecimal(inputValue)
-                            hex -> hexToDecimal(inputValue)
-                            else -> 0
-                        }
-                        val decimalToOutput = when (outputSystem) {
-                            decimal -> inputInDecimal
-                            binary -> Integer.toBinaryString(inputInDecimal.toInt())
-                            octal -> Integer.toOctalString(inputInDecimal.toInt())
-                            hex -> Integer.toHexString(inputInDecimal.toInt())
-                            else -> 0
-                        }
-                        result = decimalToOutput.toString().uppercase()
+                    if (inputValue.isEmpty()) return
+
+                    val inputInDecimal = when (inputSystem) {
+                        decimal -> inputValue.toIntOrNull() ?: 0
+                        binary -> binaryToDecimal(inputValue)
+                        octal -> octalToDecimal(inputValue)
+                        hex -> hexToDecimal(inputValue)
+                        else -> 0
                     }
+                    val decimalToOutput = when (outputSystem) {
+                        decimal -> inputInDecimal
+                        binary -> Integer.toBinaryString(inputInDecimal.toInt())
+                        octal -> Integer.toOctalString(inputInDecimal.toInt())
+                        hex -> Integer.toHexString(inputInDecimal.toInt())
+                        else -> 0
+                    }
+                    result = decimalToOutput.toString().uppercase()
+
                 }
 
                 Text(
@@ -174,6 +176,17 @@ fun NumberConverterApp(onDismiss: () -> Unit) {
                             }
                         }
                     }
+                }
+                Button(onClick = {
+                    val tempUnit = inputSystem
+                    inputSystem = outputSystem
+                    outputSystem = tempUnit
+                    calculateResult()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.SwapHoriz,
+                        contentDescription = "Reverse Units Buttons"
+                    )
                 }
                 Text(
                     text = "Result: $result",

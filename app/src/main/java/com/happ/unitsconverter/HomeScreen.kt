@@ -2,7 +2,6 @@ package com.happ.unitsconverter
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,7 +26,6 @@ fun HomeScreen(modifier: Modifier) {
     var showCurrency by remember { mutableStateOf(false) }
     var showWeight by remember { mutableStateOf(false) }
 
-    // Show respective converter UI based on state
     if (showLength) LengthConverterApp(onDismiss = { showLength = false })
     if (showVolume) VolumeConverterApp(onDismiss = { showVolume = false })
     if (showNumber) NumberConverterApp(onDismiss = { showNumber = false })
@@ -80,14 +78,6 @@ fun HomeScreen(modifier: Modifier) {
                 modifier = Modifier.weight(1f)
             )
         }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = "Made with ❤️ by Team HAP-P",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
     }
 }
 
@@ -99,8 +89,7 @@ fun ConverterButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier
-            .height(50.dp)
+        modifier = modifier.height(50.dp)
     ) {
         Text(text = text)
     }
